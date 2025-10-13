@@ -1,4 +1,5 @@
-﻿using BookingService.Model.ServiceResponse;
+﻿using System.Net;
+using BookingService.Middlewares;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -10,21 +11,20 @@ public class ValidationFilterAttribute : IActionFilter
     {
         if (!context.ModelState.IsValid)
         {
-            var errorMessages = new List<string>();
-            foreach (var entry in context.ModelState.Values)
-            {
-                foreach (var entryError in entry.Errors)
+            var errorMessages = context
+                .ModelState.Values.SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage)
+                .ToList();
+
+            context.Result = new BadRequestObjectResult(
+                new ErrorResponse
                 {
-                    errorMessages.Add(entryError.ErrorMessage);
+                    StatusCode = (int)HttpStatusCode.BadRequest,
+                    Message = string.Join(", \n", errorMessages),
                 }
-            }
-            var response = new ResponseBase()
-            {
-                Success = false,
-                ErrorMessage = string.Join(", \n", errorMessages) 
-            };
-            context.Result = new BadRequestObjectResult(response);
+            );
         }
     }
-    public void OnActionExecuted(ActionExecutedContext context) {}
+
+    public void OnActionExecuted(ActionExecutedContext context) { }
 }

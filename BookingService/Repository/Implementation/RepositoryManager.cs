@@ -2,6 +2,11 @@
 
 namespace BookingService.Repository.Implementation;
 
-public class RepositoryManager: IRepositoryManager
+public class RepositoryManager(
+    IAvailabilityPeriodRepository availabilityPeriodRepository,
+    IAccommodationRepository accommodationRepository) : IRepositoryManager
 {
+    public IAvailabilityPeriodRepository AvailabilityPeriodRepository { get; } = availabilityPeriodRepository;
+    public IAccommodationRepository AccommodationRepository { get; } = accommodationRepository;
+
 }

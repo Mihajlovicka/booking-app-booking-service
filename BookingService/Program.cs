@@ -45,7 +45,6 @@ builder.Services.AddControllers(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -70,9 +69,8 @@ app.UseExceptionHandler(builder =>
         }
     });
 });
-app.UseAuthorization();
-
 app.UseCors(CorsExtensions.GetCorsPolicyName());
+app.UseAuthorization();
 
 app.MapControllers();
 app.ApplyPendingMigrations();

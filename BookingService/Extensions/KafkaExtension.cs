@@ -13,18 +13,20 @@ public static class KafkaExtensions
     {
         // Configure Producer
         services.Configure<ProducerConfig>(configuration.GetSection("KafkaConfig:Producer"));
-        //services.AddSingleton<ProducerService>();
+        services.AddSingleton<ProducerService>();
 
         // Configure Consumer
         services.Configure<ConsumerConfig>(configuration.GetSection("KafkaConfig:Consumer"));
-        // services.AddHostedService(provider =>
-        // {
-        //     var logger = provider.GetRequiredService<ILogger<ConsumerService>>();
-        //     var consumerConfig = provider.GetRequiredService<IOptions<ConsumerConfig>>();
-        //     var topic = KafkaTopic.TestTopic;
+        services.AddHostedService(provider =>
+        {
+            var logger = provider.GetRequiredService<ILogger<ConsumerService>>();
+            var consumerConfig = provider.GetRequiredService<IOptions<ConsumerConfig>>();
+            var scopeFactory = provider.GetRequiredService<IServiceScopeFactory>();
+            var topic = KafkaTopic.AccommodationCreated;
 
-        //     return new ConsumerService(logger, consumerConfig, topic);
-        // });
+            return new ConsumerService(logger, consumerConfig, topic, scopeFactory);
+        });
+
 
         return services;
     }
