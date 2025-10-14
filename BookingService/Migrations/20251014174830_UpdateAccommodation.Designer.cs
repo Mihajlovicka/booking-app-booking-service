@@ -3,6 +3,7 @@ using System;
 using BookingService.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookingService.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251014174830_UpdateAccommodation")]
+    partial class UpdateAccommodation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,11 +45,6 @@ namespace BookingService.Migrations
                     b.Property<int?>("MinNumberOfGuests")
                         .HasColumnType("int")
                         .HasColumnName("min_number_of_guests");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("Owner")
                         .IsRequired()
@@ -130,29 +128,6 @@ namespace BookingService.Migrations
                     b.ToTable("AvailabilityPeriods");
                 });
 
-            modelBuilder.Entity("BookingService.Model.Entity.Picture", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    b.Property<int>("AccommodationId")
-                        .HasColumnType("int")
-                        .HasColumnName("accommodation_id");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("url");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AccommodationId");
-
-                    b.ToTable("Picture");
-                });
-
             modelBuilder.Entity("Accommodation", b =>
                 {
                     b.HasOne("BookingService.Model.Entity.Address", "Address")
@@ -175,22 +150,9 @@ namespace BookingService.Migrations
                     b.Navigation("Accommodation");
                 });
 
-            modelBuilder.Entity("BookingService.Model.Entity.Picture", b =>
-                {
-                    b.HasOne("Accommodation", "Accommodation")
-                        .WithMany("Pictures")
-                        .HasForeignKey("AccommodationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Accommodation");
-                });
-
             modelBuilder.Entity("Accommodation", b =>
                 {
                     b.Navigation("AvailabilityPeriods");
-
-                    b.Navigation("Pictures");
                 });
 #pragma warning restore 612, 618
         }

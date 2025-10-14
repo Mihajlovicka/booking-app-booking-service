@@ -52,7 +52,8 @@ public class AvailabilityServiceTests
 
         _mockMapperManager
             .Setup(m => m.AvailabilityPeriodToAvailabilityPeriodDtoMapper.Map(It.IsAny<AvailabilityPeriod>()))
-            .Returns((AvailabilityPeriod p) => mappedPeriods.First(mp => mp.Id == p.Id));
+            .ReturnsAsync((AvailabilityPeriod p) => mappedPeriods.First(mp => mp.Id == p.Id));
+
 
         // Act
         var result = await _availabilityService.GetByAccommodation(accommodationId);
@@ -97,7 +98,7 @@ public class AvailabilityServiceTests
                               .ReturnsAsync(accommodation);
 
         _mockMapperManager.Setup(m => m.AvailabilityPeriodToAvailabilityPeriodDtoMapper.Map(It.IsAny<AvailabilityPeriod>()))
-                          .Returns(dto);
+                          .ReturnsAsync(dto);
 
         // Act
         var result = await _availabilityService.Add(accommodationId, dto);

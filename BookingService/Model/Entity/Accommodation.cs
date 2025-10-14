@@ -16,10 +16,29 @@ public class Accommodation
 
     [Required]
     [MaxLength(100)]
+    public string Name { get; set; } = null!;
+
+    [Required]
+    [MaxLength(100)]
     public string Owner { get; set; } = null!;
 
     [Required]
     public PriceType PriceType { get; set; }
+
+    [ForeignKey("AddressId")]
+    [Column("address_id")]
+    public int AddressId { get; set; }
+    public Address Address { get; set; }
+
+    [Range(1, int.MaxValue)]
+    [Column("min_number_of_guests")]
+    public int? MinNumberOfGuests { get; set; }
+
+    [Range(1, int.MaxValue)]
+    [Column("max_number_of_guests")]
+    public int? MaxNumberOfGuests { get; set; }
+
+    public IList<Picture> Pictures { get; set; } = new List<Picture>();
 
     public ICollection<AvailabilityPeriod> AvailabilityPeriods { get; set; } = new List<AvailabilityPeriod>();
 }

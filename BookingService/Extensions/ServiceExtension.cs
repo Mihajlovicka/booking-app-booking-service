@@ -26,11 +26,14 @@ public static class ServiceExtensions
         services.AddScoped<IMapperManager, MapperManager>();
         services.AddScoped<IBaseMapper<AccommodationCreatedDto, Accommodation>, AccommodationCreatedDtoToAccommodationMapper>();
         services.AddScoped<IBaseMapper<AvailabilityPeriod, AvailabilityPeriodDto>, AvailabilityPeriodToAvailabilityPeriodDtoMapper>();
+        services.AddScoped<IBaseMapper<AddressDto, Address>, AddressDtoToAddressMapper>();
+        services.AddScoped<IBaseMapper<Accommodation, AccommodationDto>, AccommodationToAccommodationDtoMapper>();
 
         // Repository-related scoped services
         services.AddScoped<IRepositoryManager, RepositoryManager>();
         services.AddScoped<IAccommodationRepository, AccommodationRepository>();
         services.AddScoped<IAvailabilityPeriodRepository, AvailabilityPeriodRepository>();
+        services.AddScoped<IAddressRepository, AddressRepository>();
 
 
         return services;
