@@ -8,4 +8,6 @@ public interface IMapperManager
 {
     IBaseMapper<AvailabilityPeriod, AvailabilityPeriodDto> AvailabilityPeriodToAvailabilityPeriodDtoMapper { get; }
     IBaseMapper<AccommodationCreatedDto, Accommodation> AccommodationToAccommodationCreatedDtoMapper { get; }
+    IBaseMapper<AddressDto, Address> AddressDtoToAddressMapper { get; }
+    IBaseMapper<Accommodation, AccommodationDto> AccommodationToAccommodationDtoMapper { get; }
 }

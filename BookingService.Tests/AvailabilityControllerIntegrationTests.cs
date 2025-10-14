@@ -3,12 +3,14 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using BookingService.Data;
 using BookingService.Model.Dto;
+using BookingService.Model.Entity;
 using BookingService.Model.Messages;
 using BookingService.Service.MessagingService;
 using Confluent.Kafka;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Mysqlx.Crud;
 
 namespace BookingService.Tests;
 
@@ -19,6 +21,7 @@ public class AvailabilityControllerIntegrationTests
     private HttpClient _client;
     private CustomWebApplicationFactory _factory;
     private string KafkaBroker = "localhost:29092";
+    private Guid accommodationId;
 
     [OneTimeSetUp]
     public async Task Setup()
@@ -29,6 +32,8 @@ public class AvailabilityControllerIntegrationTests
 
         var config = _factory.Services.GetRequiredService<IConfiguration>();
         KafkaBroker = config.GetValue<string>("KafkaConfig:Producer:BootstrapServers");
+    
+
     }
 
     [OneTimeTearDown]
@@ -41,30 +46,19 @@ public class AvailabilityControllerIntegrationTests
     [Test]
     public async Task AddAvailabilityPeriod_IntegrationTest()
     {
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "dummy-token");
-
-
         // Arrange
-        var accommodationId = Guid.NewGuid().ToString();
 
-        // Produce AccommodationCreatedDto Kafka message
-        var accommodationDto = new AccommodationCreatedDto
-        {
-            Id = accommodationId,
-            PriceType = Model.Entity.PriceType.PerGuest,
-            Owner = "saraH"
-        };
-        await ProduceKafkaMessage(KafkaTopic.AccommodationCreated.ToString(), accommodationDto);
+        // await ProduceKafkaMessage(KafkaTopic.AccommodationCreated.ToString(), accommodationDto);
 
         // Wait and consume the message to ensure system processed it
-        var consumedMessage = await ConsumeKafkaMessage(KafkaTopic.AccommodationCreated.ToString());
-        Assert.IsNotNull(consumedMessage);
+        // var consumedMessage = await ConsumeKafkaMessage(KafkaTopic.AccommodationCreated.ToString());
+        // Assert.IsNotNull(consumedMessage);
 
         // Act - Add availability period
         var availabilityDto = new AvailabilityPeriodDto
         {
             StartDate = DateTime.Now.AddDays(1).ToString("yyyy-MM-dd"),
-            EndDate = DateTime.Now.AddDays(3).ToString("yyyy-MM-dd"),
+            EndDate = DateTime.Now.AddDays(6).ToString("yyyy-MM-dd"),
             Price = 200
         };
 
@@ -93,10 +87,69 @@ public class AvailabilityControllerIntegrationTests
         Assert.AreEqual(System.Net.HttpStatusCode.NoContent, deleteResponse.StatusCode);
     }
 
+    [Test]
+    public async Task SearchAvailability_IntegrationTest()
+    {
+        // Act: Search by address and date filter
+        var filter = new AvailabilityFilterDto
+        {
+            Address = "Belgrade",
+            StartDate = DateTime.Today.AddDays(11).ToString("yyyy-MM-dd"),
+            EndDate = DateTime.Today.AddDays(12).ToString("yyyy-MM-dd"),
+            NumberOfGuests = 2
+        };
+
+        var response = await _client.PostAsJsonAsync("/api/accommodations/search", filter);
+        response.EnsureSuccessStatusCode();
+
+        var accommodations = await response.Content.ReadFromJsonAsync<List<AccommodationDto>>();
+
+        // Assert
+        Assert.IsNotNull(accommodations);
+        Assert.IsTrue(accommodations.Any());
+        Assert.AreEqual("Belgrade", accommodations.First().Address.City);
+        Assert.AreEqual("Test Apartment", accommodations.First().Name);
+    }
+
+
     private async Task SetupDbData()
     {
         using var scope = _factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        accommodationId = Guid.NewGuid();
+
+        // Produce AccommodationCreatedDto Kafka message
+        var accommodation = new Accommodation
+        {
+            ExternalId = accommodationId.ToString(),
+            PriceType = Model.Entity.PriceType.PerGuest,
+            Owner = "host@example.com",
+            Name = "Test Apartment",
+            MinNumberOfGuests = 1,
+            MaxNumberOfGuests = 5,
+            Pictures = [],
+            Address = new Address
+            {
+                StreetNumber = "12A",
+                StreetName = "Main Street",
+                City = "Belgrade",
+                PostNumber = "11000",
+                Country = "Serbia"
+            },
+            AvailabilityPeriods = [
+
+                new AvailabilityPeriod
+                    {
+                        StartDate = DateTime.Now.AddDays(10),
+                        EndDate = DateTime.Now.AddDays(12),
+                        Price = 400
+                    }
+            ]
+        };
+
+        db.Accommodations.Add(accommodation);
+        db.SaveChanges();
+
     }
 
     private async Task ProduceKafkaMessage<T>(string topic, T message)

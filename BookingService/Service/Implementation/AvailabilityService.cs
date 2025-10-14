@@ -13,10 +13,15 @@ public class AvailabilityService(
         IMapperManager mapper
     ) : IAvailabilityService
 {
+    public async Task<IEnumerable<AccommodationDto>> Search(AvailabilityFilterDto? availabilityFilterDto)
+    {
+        var accommodations = await repositoryManager.AccommodationRepository.Search(availabilityFilterDto);
+        return  await Task.WhenAll(accommodations.Select(async p => await mapper.AccommodationToAccommodationDtoMapper.Map(p)));
+    }
     public async Task<IEnumerable<AvailabilityPeriodDto>> GetByAccommodation(string accommodationId)
     {
         var periods = await repositoryManager.AvailabilityPeriodRepository.GetByAccommodation(accommodationId);
-        return periods.Select(p => mapper.AvailabilityPeriodToAvailabilityPeriodDtoMapper.Map(p));
+        return await Task.WhenAll(periods.Select(async p => await mapper.AvailabilityPeriodToAvailabilityPeriodDtoMapper.Map(p)));
     }
 
     public async Task<AvailabilityPeriodDto> Add(string accommodationId, AvailabilityPeriodDto dto)
@@ -46,7 +51,7 @@ public class AvailabilityService(
             await repositoryManager.AvailabilityPeriodRepository.AddAsync(period);
         }
 
-        return mapper.AvailabilityPeriodToAvailabilityPeriodDtoMapper.Map(period);
+        return await mapper.AvailabilityPeriodToAvailabilityPeriodDtoMapper.Map(period);
     }
 
     public async Task Delete(int id)

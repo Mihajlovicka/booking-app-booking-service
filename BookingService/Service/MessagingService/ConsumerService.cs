@@ -4,6 +4,7 @@ using BookingService.Model.Messages;
 using BookingService.Repository.Contract;
 using BookingService.Service.MessagingService;
 using Confluent.Kafka;
+using Confluent.Kafka.Admin;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
@@ -59,8 +60,7 @@ public class ConsumerService : BackgroundService
                         _logger.LogWarning("Message was not a AccommodationCreatedDto. Skipping...");
                         continue;
                     }
-
-                    var accommodation = _mapperManager.AccommodationToAccommodationCreatedDtoMapper.Map(accommodationDto);
+                    var accommodation = await _mapperManager.AccommodationToAccommodationCreatedDtoMapper.Map(accommodationDto);
                     var existingAcc = await _repositoryManager.AccommodationRepository.GetByExternalIdAsync(accommodation.ExternalId);
                     if (existingAcc != null){
                         existingAcc.PriceType = accommodation.PriceType;
@@ -68,6 +68,15 @@ public class ConsumerService : BackgroundService
                     }
                     else
                     {
+                        var address = new Address
+                        {
+                            StreetNumber = accommodationDto.Address.StreetNumber,
+                            StreetName = accommodationDto.Address.StreetName,
+                            City = accommodationDto.Address.City,
+                            PostNumber = accommodationDto.Address.PostNumber,
+                            Country = accommodationDto.Address.Country
+                        };
+                        accommodation.Address = address;
                         await _repositoryManager.AccommodationRepository.AddAsync(accommodation);
                     }
                     _logger.LogInformation($"Accommodation '{accommodationDto.Id}' saved successfully!");

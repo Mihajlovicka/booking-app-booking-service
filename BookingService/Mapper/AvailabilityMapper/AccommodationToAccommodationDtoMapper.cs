@@ -6,7 +6,7 @@ namespace BookingService.Mapper.AccommodationMapper;
 public class AvailabilityPeriodToAvailabilityPeriodDtoMapper(
     ) : BaseMapper<AvailabilityPeriod, AvailabilityPeriodDto>
 {
-    public override AvailabilityPeriodDto Map(AvailabilityPeriod source)
+    public override async Task<AvailabilityPeriodDto> Map(AvailabilityPeriod source)
     {
         return new AvailabilityPeriodDto()
         {

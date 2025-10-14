@@ -12,6 +12,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     }
     
     public DbSet<Accommodation> Accommodations { get; set; }
+    public DbSet<Address> Addresses { get; set; }
     public DbSet<AvailabilityPeriod> AvailabilityPeriods { get; set; }
     
 }
