@@ -14,5 +14,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<Accommodation> Accommodations { get; set; }
     public DbSet<Address> Addresses { get; set; }
     public DbSet<AvailabilityPeriod> AvailabilityPeriods { get; set; }
-    
+    public DbSet<ReservationRequest> ReservationRequests { get; set; }
+    public DbSet<Reservation> Reservations { get; set; }
+    public DbSet<User> Users { get; set; }
 }

@@ -26,7 +26,6 @@ public class AvailabilityServiceTests
 
         _availabilityService = new BookingService.Service.Implementation.AvailabilityService(
             _mockRepositoryManager.Object,
-            _mockUserContext.Object,
             _mockMapperManager.Object
         );
     }
@@ -47,7 +46,7 @@ public class AvailabilityServiceTests
             };
 
         _mockRepositoryManager
-            .Setup(r => r.AvailabilityPeriodRepository.GetByAccommodation(accommodationId))
+            .Setup(r => r.AvailabilityPeriodRepository.GetByAccommodation(accommodationId, null))
             .ReturnsAsync(periods);
 
         _mockMapperManager
@@ -71,7 +70,7 @@ public class AvailabilityServiceTests
         var dto = new AvailabilityPeriodDto { StartDate = "2025-10-14", EndDate = "2025-10-16", Price = 100 };
 
         _mockRepositoryManager
-            .Setup(r => r.AvailabilityPeriodRepository.Overlaps(accommodationId, dto.Id, DateTime.Parse(dto.StartDate), DateTime.Parse(dto.EndDate), null))
+            .Setup(r => r.AvailabilityPeriodRepository.Overlaps(accommodationId, dto.Id, DateTime.Parse(dto.StartDate), DateTime.Parse(dto.EndDate)))
             .Returns(true);
 
         // Act & Assert
@@ -91,7 +90,7 @@ public class AvailabilityServiceTests
         var accommodation = new Accommodation { ExternalId = accommodationId };
         var period = new AvailabilityPeriod { StartDate = DateTime.Parse(dto.StartDate), EndDate = DateTime.Parse(dto.EndDate), Price = dto.Price, Accommodation = accommodation };
 
-        _mockRepositoryManager.Setup(r => r.AvailabilityPeriodRepository.Overlaps(accommodationId, dto.Id, period.StartDate, period.EndDate, null))
+        _mockRepositoryManager.Setup(r => r.AvailabilityPeriodRepository.Overlaps(accommodationId, dto.Id, period.StartDate, period.EndDate))
                               .Returns(false);
 
         _mockRepositoryManager.Setup(r => r.AccommodationRepository.GetByExternalIdAsync(accommodationId))
