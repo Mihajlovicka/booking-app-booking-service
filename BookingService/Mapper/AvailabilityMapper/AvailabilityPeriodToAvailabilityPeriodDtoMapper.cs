@@ -1,7 +1,7 @@
 ﻿using BookingService.Model.Dto;
 using BookingService.Model.Entity;
 
-namespace BookingService.Mapper.AccommodationMapper;
+namespace BookingService.Mapper.AvailabilityMapper;
 
 public class AvailabilityPeriodToAvailabilityPeriodDtoMapper(
     ) : BaseMapper<AvailabilityPeriod, AvailabilityPeriodDto>

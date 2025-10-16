@@ -15,18 +15,23 @@ public static class KafkaExtensions
         services.Configure<ProducerConfig>(configuration.GetSection("KafkaConfig:Producer"));
         services.AddSingleton<ProducerService>();
 
-        // Configure Consumer
+        // Configure Consumer - listening to multiple topics
         services.Configure<ConsumerConfig>(configuration.GetSection("KafkaConfig:Consumer"));
         services.AddHostedService(provider =>
         {
             var logger = provider.GetRequiredService<ILogger<ConsumerService>>();
             var consumerConfig = provider.GetRequiredService<IOptions<ConsumerConfig>>();
             var scopeFactory = provider.GetRequiredService<IServiceScopeFactory>();
-            var topic = KafkaTopic.AccommodationCreated;
 
-            return new ConsumerService(logger, consumerConfig, topic, scopeFactory);
+            // Listen to both topics
+            var topics = new[]
+            {
+                KafkaTopic.AccommodationCreated,
+                KafkaTopic.UserCreated
+            };
+
+            return new ConsumerService(logger, consumerConfig, topics, scopeFactory);
         });
-
 
         return services;
     }

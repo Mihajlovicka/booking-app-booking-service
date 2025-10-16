@@ -11,7 +11,9 @@ public class AccommodationCreatedDtoToAccommodationMapper(
         {
             ExternalId = source.Id,
             PriceType = source.PriceType,
-            Owner = source.Owner
+            Owner = source.Owner,
+            MinNumberOfGuests = source.MinNumberOfGuests,
+            MaxNumberOfGuests = source.MaxNumberOfGuests
         };
     }
 }

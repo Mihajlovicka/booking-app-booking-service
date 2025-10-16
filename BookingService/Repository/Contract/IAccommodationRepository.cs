@@ -1,7 +1,4 @@
-﻿using System.Linq.Expressions;
-using BookingService.Model.Entity;
-
-namespace BookingService.Repository.Contract;
+﻿namespace BookingService.Repository.Contract;
 
 public interface IAccommodationRepository : ICrudRepository<Accommodation>
 {    

@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using BookingService.Mapper;
+﻿using BookingService.Mapper;
 using BookingService.Model.Dto;
 using BookingService.Model.Entity;
 using BookingService.Repository.Contract;
@@ -9,13 +8,12 @@ namespace BookingService.Service.Implementation;
 
 public class AvailabilityService(
         IRepositoryManager repositoryManager,
-        IUserContext userContext,
         IMapperManager mapper
     ) : IAvailabilityService
 {
-    public async Task<IEnumerable<AvailabilityPeriodDto>> GetByAccommodation(string accommodationId)
+    public async Task<IEnumerable<AvailabilityPeriodDto>> GetByAccommodation(string accommodationId,  bool? fromToday=null)
     {
-        var periods = await repositoryManager.AvailabilityPeriodRepository.GetByAccommodation(accommodationId);
+        var periods = await repositoryManager.AvailabilityPeriodRepository.GetByAccommodation(accommodationId, fromToday);
         return periods.Select(p => mapper.AvailabilityPeriodToAvailabilityPeriodDtoMapper.Map(p));
     }
 

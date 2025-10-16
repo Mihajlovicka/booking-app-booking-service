@@ -3,6 +3,7 @@ using System;
 using BookingService.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookingService.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251016195725_ReservationsUserMigration")]
+    partial class ReservationsUserMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,14 +33,6 @@ namespace BookingService.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
-
-                    b.Property<int?>("MaxNumberOfGuests")
-                        .HasColumnType("int")
-                        .HasColumnName("max_number_of_guests");
-
-                    b.Property<int?>("MinNumberOfGuests")
-                        .HasColumnType("int")
-                        .HasColumnName("min_number_of_guests");
 
                     b.Property<string>("Owner")
                         .IsRequired()
@@ -89,16 +84,8 @@ namespace BookingService.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("date");
 
-                    b.Property<Guid>("ExternalId")
-                        .HasMaxLength(36)
-                        .HasColumnType("char(36)")
-                        .HasColumnName("external_id");
-
                     b.Property<decimal>("FinalPrice")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("GuestNumber")
-                        .HasColumnType("int");
 
                     b.Property<string>("GuestUsername")
                         .IsRequired()
@@ -126,28 +113,22 @@ namespace BookingService.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("date");
 
-                    b.Property<Guid>("ExternalId")
-                        .HasMaxLength(36)
-                        .HasColumnType("char(36)")
-                        .HasColumnName("external_id");
-
                     b.Property<decimal>("FinalPrice")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("GuestNumber")
                         .HasColumnType("int");
 
+                    b.Property<string>("GuestUsername")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("date");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AccommodationId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("ReservationRequests");
                 });
@@ -188,7 +169,7 @@ namespace BookingService.Migrations
             modelBuilder.Entity("BookingService.Model.Entity.Reservation", b =>
                 {
                     b.HasOne("Accommodation", "Accommodation")
-                        .WithMany("Reservations")
+                        .WithMany()
                         .HasForeignKey("AccommodationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -204,22 +185,12 @@ namespace BookingService.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BookingService.Model.Entity.User", "Guest")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Accommodation");
-
-                    b.Navigation("Guest");
                 });
 
             modelBuilder.Entity("Accommodation", b =>
                 {
                     b.Navigation("AvailabilityPeriods");
-
-                    b.Navigation("Reservations");
                 });
 #pragma warning restore 612, 618
         }

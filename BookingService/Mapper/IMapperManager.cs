@@ -8,4 +8,11 @@ public interface IMapperManager
 {
     IBaseMapper<AvailabilityPeriod, AvailabilityPeriodDto> AvailabilityPeriodToAvailabilityPeriodDtoMapper { get; }
     IBaseMapper<AccommodationCreatedDto, Accommodation> AccommodationToAccommodationCreatedDtoMapper { get; }
+    IBaseMapper<UserDto, User> UserDtoToUserMapper { get; }
+    IBaseMapper<CreateReservationRequestDto, ReservationRequest> CreateReservationRequestDtoToReservationRequestMapper
+    {
+        get;
+    }
+    IBaseMapper<ReservationRequest, ReservationRequestDto> ReservationRequestToReservationRequestDtoMapper { get; }
+    IBaseMapper<Reservation, ReservationDto> ReservationToReservationDtoMapper { get; }
 }
