@@ -41,4 +41,6 @@ public class Accommodation
     public IList<Picture> Pictures { get; set; } = new List<Picture>();
 
     public ICollection<AvailabilityPeriod> AvailabilityPeriods { get; set; } = new List<AvailabilityPeriod>();
+    
+    public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
 }

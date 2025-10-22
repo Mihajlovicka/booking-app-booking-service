@@ -41,14 +41,11 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<ValidationFilterAttribute>();
 });
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment() || app.Environment.EnvironmentName == "Docker")
 {
     app.UseSwagger();
@@ -69,7 +66,9 @@ app.UseExceptionHandler(builder =>
         }
     });
 });
+
 app.UseCors(CorsExtensions.GetCorsPolicyName());
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

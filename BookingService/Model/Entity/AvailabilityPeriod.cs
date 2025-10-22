@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BookingService.Model.Entity;    
+namespace BookingService.Model.Entity;
+
 public class AvailabilityPeriod
     {
         [Key]

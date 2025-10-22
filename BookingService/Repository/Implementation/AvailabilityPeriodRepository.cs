@@ -1,6 +1,4 @@
-﻿using System.Linq.Expressions;
-using System.Threading.Tasks;
-using BookingService.Data;
+﻿using BookingService.Data;
 using BookingService.Model.Entity;
 using BookingService.Repository.Contract;
 using Microsoft.EntityFrameworkCore;
@@ -11,22 +9,27 @@ public class AvailabilityPeriodRepository(AppDbContext context)
     : CrudRepository<AvailabilityPeriod>(context), IAvailabilityPeriodRepository
 {
 
-    public async Task<IEnumerable<AvailabilityPeriod>> GetByAccommodation(string accommodationId)
+    public async Task<IEnumerable<AvailabilityPeriod>> GetByAccommodation(string accommodationId, bool? fromToday=null)
     {
-         return await _dbSet
+        var query = _dbSet
             .Include(p => p.Accommodation)
-            .Where(p => p.Accommodation.ExternalId == accommodationId)
-            .ToListAsync();
+            .Where(p => p.Accommodation.ExternalId == accommodationId);
+
+        if (fromToday != true) return await query.ToListAsync();
+        {
+            var today = DateTime.UtcNow.Date;
+            query = query.Where(p => p.StartDate.Date >= today);
+        }
+
+        return await query.ToListAsync();
     }
 
-    public bool Overlaps(string accommodationId, int? periodId, DateTime start, DateTime end, int? excludeId = null)
+    public bool Overlaps(string accommodationId, int? periodId, DateTime start, DateTime end)
     {
         return  _dbSet.Include(p => p.Accommodation).Any(p =>
             p.Accommodation.ExternalId == accommodationId &&
-            (!excludeId.HasValue || p.Id != excludeId) &&
             p.StartDate < end && p.EndDate > start &&
             (p.Id != periodId)
         );
     }
-
 }
