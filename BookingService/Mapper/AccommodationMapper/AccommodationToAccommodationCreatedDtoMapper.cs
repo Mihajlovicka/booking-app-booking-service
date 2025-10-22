@@ -16,7 +16,8 @@ public class AccommodationCreatedDtoToAccommodationMapper(
             Owner = source.Owner,
             MaxNumberOfGuests = source.MaxNumberOfGuests,
             MinNumberOfGuests = source.MinNumberOfGuests,
-            Pictures = source.Pictures.Select(url => new Picture { Url = url }).ToList()
+            Pictures = source.Pictures.Select(url => new Picture { Url = url }).ToList(),
+            AutomaticReservation = source.AutomaticReservation
         };
     }
 }

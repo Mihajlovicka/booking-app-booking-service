@@ -6,7 +6,7 @@ using BookingService.Service.Contract;
 
 namespace BookingService.Service.Implementation;
 
-public class ReservationRequestService(IMapperManager mapperManager, IRepositoryManager repositoryManager) : IReservationRequestService
+public class ReservationRequestService(IMapperManager mapperManager, IRepositoryManager repositoryManager, IReservationService reservationService) : IReservationRequestService
 {
     public async Task<ReservationRequestDto> Add(string guestUsername, CreateReservationRequestDto dto)
     {
@@ -45,9 +45,66 @@ public class ReservationRequestService(IMapperManager mapperManager, IRepository
 
         await repositoryManager.ReservationRequestRepository.AddAsync(reservationRequest);
 
+        if (reservationRequest.Accommodation.AutomaticReservation)
+        {
+            await AcceptRequest(reservationRequest.ExternalId.ToString());
+        }
+
         return await mapperManager.ReservationRequestToReservationRequestDtoMapper.Map(reservationRequest);
     }
-    
+
+    public async Task<IEnumerable<ReservationRequestDto>> GetAllForAccommodation(string accommodationId)
+    {
+        var reservationRequests =
+            await repositoryManager.ReservationRequestRepository.GetAllForAccommodation(accommodationId);
+
+        var mappedRequests = new List<ReservationRequestDto>();
+
+        foreach (var request in reservationRequests)
+        {
+            var mapped = await mapperManager.ReservationRequestToReservationRequestDtoMapper.Map(request);
+            mappedRequests.Add(mapped);
+        }
+
+        return mappedRequests;
+    }
+
+    public async Task RejectRequest(string requestExternalId)
+    {
+        if (!Guid.TryParse(requestExternalId, out var requestGuid))
+            throw new Exception("Invalid reservation request ID");
+
+        var reservationRequest = await repositoryManager.ReservationRequestRepository.GerByExternalId(requestGuid);
+
+        if (reservationRequest == null) 
+            throw new Exception("Request not found");
+
+        await repositoryManager.ReservationRequestRepository.DeleteAsync(reservationRequest.Id);
+    }
+
+    public async Task AcceptRequest(string requestExternalId)
+    {
+        if (!Guid.TryParse(requestExternalId, out var requestGuid))
+            throw new Exception("Invalid reservation request ID");
+
+        var reservationRequest = await repositoryManager.ReservationRequestRepository.GerByExternalId(requestGuid);
+
+        if (reservationRequest == null) 
+            throw new Exception("Request not found");
+        
+        var requestsForDeletion = await repositoryManager.ReservationRequestRepository.Overlaps(
+            reservationRequest.Accommodation.ExternalId, reservationRequest.StartDate, reservationRequest.EndDate);
+
+        foreach (var request in requestsForDeletion)
+        {
+            await repositoryManager.ReservationRequestRepository.DeleteAsync(request.Id);
+        }
+        
+        await reservationService.CreateReservation(reservationRequest);
+
+        await repositoryManager.ReservationRequestRepository.DeleteAsync(reservationRequest.Id);
+    }
+
     private static decimal GetFinalPrice(Accommodation accommodation, AvailabilityPeriod availabilityPeriod, int guestNum)
     {
         var numOfDays = GetNumOfDays(availabilityPeriod.StartDate, availabilityPeriod.EndDate);

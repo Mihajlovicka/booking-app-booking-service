@@ -5,4 +5,5 @@ namespace BookingService.Repository.Contract;
 public interface IReservationRepository : ICrudRepository<Reservation>
 {
     Task<List<Reservation>> GetAllReservationsForAccommodation(string accommodationId);
+    bool Overlaps(string accommodationId, DateTime start, DateTime end);
 }
