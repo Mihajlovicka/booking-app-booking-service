@@ -1,9 +1,10 @@
 ﻿using BookingService.Model.Dto;
 using BookingService.Model.Entity;
+using BookingService.Repository.Contract;
 
 namespace BookingService.Mapper.ReservationMapper;
 
-public class ReservationToReservationDtoMapper : BaseMapper<Reservation, ReservationDto>
+public class ReservationToReservationDtoMapper() : BaseMapper<Reservation, ReservationDto>
 {
     public override Task<ReservationDto> Map(Reservation source)
     {
