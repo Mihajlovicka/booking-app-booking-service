@@ -8,4 +8,5 @@ public interface IReservationRequestService
     Task<IEnumerable<ReservationRequestDto>> GetAllForAccommodation(string accommodationId);
     Task RejectRequest(string requestExternalId);
     Task AcceptRequest(string requestExternalId);
+    Task<IEnumerable<ReservationRequestDto>> GetMyReservationRequests(string username);
 }

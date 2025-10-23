@@ -105,6 +105,20 @@ public class ReservationRequestService(IMapperManager mapperManager, IRepository
         await repositoryManager.ReservationRequestRepository.DeleteAsync(reservationRequest.Id);
     }
 
+    public async Task<IEnumerable<ReservationRequestDto>> GetMyReservationRequests(string username)
+    {
+        var requests = await repositoryManager.ReservationRequestRepository.GetMy(username);
+
+        List<ReservationRequestDto> result = [];
+
+        foreach (var request in requests)
+        {
+            result.Add(await mapperManager.ReservationRequestToReservationRequestDtoMapper.Map(request));
+        }
+
+        return result;
+    }
+
     private static decimal GetFinalPrice(Accommodation accommodation, AvailabilityPeriod availabilityPeriod, int guestNum)
     {
         var numOfDays = GetNumOfDays(availabilityPeriod.StartDate, availabilityPeriod.EndDate);
