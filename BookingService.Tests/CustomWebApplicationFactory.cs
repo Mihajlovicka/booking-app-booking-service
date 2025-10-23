@@ -33,14 +33,19 @@ internal class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+
+        builder.UseEnvironment("Testing");
+
         builder.ConfigureServices(services =>
             {
                 services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = "Test";
-    options.DefaultChallengeScheme = "Test";
-})
-.AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", options => { });
+                {
+                    options.DefaultAuthenticateScheme = "Test";
+                    options.DefaultChallengeScheme = "Test";
+                })
+                .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", options => { });
+
+                
 
             });
 
