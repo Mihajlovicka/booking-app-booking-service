@@ -15,7 +15,8 @@ public class ReservationRequestToReservationRequestDtoMapper : BaseMapper<Reserv
             StartDate = source.StartDate.ToString("yyyy-MM-dd"),
             EndDate = source.EndDate.ToString("yyyy-MM-dd"),
             ExternalId = source.ExternalId,
-            AccommodationExternalId = source.Accommodation.ExternalId
+            AccommodationExternalId = source.Accommodation.ExternalId,
+            AccommodationName = source.Accommodation.Name
         };
 
         return Task.FromResult(dto);

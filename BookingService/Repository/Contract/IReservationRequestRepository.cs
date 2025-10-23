@@ -7,4 +7,5 @@ public interface IReservationRequestRepository : ICrudRepository<ReservationRequ
     Task<IEnumerable<ReservationRequest>> GetAllForAccommodation(string accommodationId);
     Task<ReservationRequest?> GerByExternalId(Guid externalId);
     Task<IEnumerable<ReservationRequest>> Overlaps(string accommodationId, DateTime start, DateTime end);
+    Task<IEnumerable<ReservationRequest>> GetMy(string username);
 }

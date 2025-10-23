@@ -9,4 +9,5 @@ public class ReservationRequestDto
     public string EndDate { get; set; }
     public Guid ExternalId { get; set; }
     public string AccommodationExternalId { get; set; }
+    public string? AccommodationName { get; set; }
 }

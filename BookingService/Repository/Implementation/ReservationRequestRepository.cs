@@ -34,4 +34,12 @@ public class ReservationRequestRepository(AppDbContext context)
                 p.StartDate < end && p.EndDate > start
                 ).ToListAsync();
     }
+
+    public async Task<IEnumerable<ReservationRequest>> GetMy(string username)
+    {
+        return await _context.ReservationRequests
+            .Include(r => r.Guest)
+            .Include(r => r.Accommodation)
+            .Where(r => r.Guest.Username == username).ToListAsync();
+    }
 }

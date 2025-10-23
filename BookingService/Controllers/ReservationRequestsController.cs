@@ -6,7 +6,7 @@ namespace BookingService.Controllers;
 
 [Authorize(Roles = "GUEST, HOST")]
 [ApiController]
-[Route("api/accommodations/{accommodationId}/reservation-requests")]
+[Route("api/reservation-requests")]
 public class ReservationRequestsController(IReservationRequestService reservationRequestService, IUserContext userContext) : ControllerBase
 {
     [HttpPost]
@@ -15,22 +15,29 @@ public class ReservationRequestsController(IReservationRequestService reservatio
         var username = userContext.Name;
         return Ok(await reservationRequestService.Add(username, dto));
     }
-
+    
     [HttpGet]
+    public async Task<IActionResult> GetMyReservationRequests()
+    {
+        var username = userContext.Name;
+        return Ok(await reservationRequestService.GetMyReservationRequests(username));
+    }
+
+    [HttpGet("{accommodationId}")]
     public async Task<IActionResult> GetAllForAccommodation(string accommodationId)
     {
         return Ok(await reservationRequestService.GetAllForAccommodation(accommodationId));
     }
 
     [HttpDelete("{reservationRequestId}")]
-    public async Task<IActionResult> RejectRequest(string accommodationId, string reservationRequestId)
+    public async Task<IActionResult> RejectRequest(string reservationRequestId)
     {
         await reservationRequestService.RejectRequest(reservationRequestId);
         return NoContent();
     }
     
     [HttpPost("{reservationRequestId}")]
-    public async Task<IActionResult> AcceptRequest(string accommodationId, string reservationRequestId)
+    public async Task<IActionResult> AcceptRequest(string reservationRequestId)
     {
         await reservationRequestService.AcceptRequest(reservationRequestId);
         return NoContent();
