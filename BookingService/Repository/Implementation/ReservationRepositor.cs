@@ -11,7 +11,7 @@ public class ReservationRepository(AppDbContext context) : CrudRepository<Reserv
     {
         return await _dbSet
             .Include(p => p.Accommodation)
-            .Where(p => p.Accommodation.ExternalId == accommodationId)
+            .Where(p => p.Accommodation.ExternalId == accommodationId && p.Active)
             .ToListAsync();
     }
     
@@ -21,7 +21,16 @@ public class ReservationRepository(AppDbContext context) : CrudRepository<Reserv
             .Include(p => p.Accommodation)
             .Any(p =>
                 p.Accommodation.ExternalId == accommodationId &&
-                p.StartDate < end && p.EndDate > start
+                p.StartDate < end && p.EndDate > start &&
+                p.Active
             );
+    }
+
+    public async Task<List<Reservation>> GetMy(string username)
+    {
+        return await _dbSet
+            .Include(p => p.Accommodation)
+            .Where(p => p.GuestUsername == username && p.Active)
+            .ToListAsync();
     }
 }

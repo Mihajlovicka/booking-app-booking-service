@@ -6,12 +6,26 @@ namespace BookingService.Controllers;
 
 [Authorize(Roles = "GUEST, HOST")]
 [ApiController]
-[Route("api/accommodations/{accommodationId}/reservations")]
-public class ReservationsController(IReservationService reservationService) : ControllerBase
+[Route("api/reservations")]
+public class ReservationsController(IReservationService reservationService, IUserContext userContext) : ControllerBase
 {
-    [HttpGet]
+    [HttpGet("my")]
+    public async Task<IActionResult> GetMy()
+    {
+        var username = userContext.Name;
+        return Ok(await reservationService.GetMy(username));
+    }
+    
+    [HttpGet("{accommodationId}")]
     public async Task<IActionResult> GetAll(string accommodationId)
     {
         return Ok(await reservationService.GetByAccommodation(accommodationId));
+    }
+    
+    [HttpDelete("{reservationId:int}")]
+    public async Task<IActionResult> Cancel(int reservationId)
+    {
+        await reservationService.Cancel(reservationId);
+        return NoContent();
     }
 }

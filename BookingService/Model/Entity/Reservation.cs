@@ -34,4 +34,8 @@ public class Reservation
     [Column("external_id")]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public Guid ExternalId { get; set; }
+    
+    [Required]
+    [Column]
+    public bool Active { get; set; } = true;
 }
