@@ -10,4 +10,5 @@ public class ReservationRequestDto
     public Guid ExternalId { get; set; }
     public string AccommodationExternalId { get; set; }
     public string? AccommodationName { get; set; }
+    public int UserCancellationNumber { get; set; }
 }

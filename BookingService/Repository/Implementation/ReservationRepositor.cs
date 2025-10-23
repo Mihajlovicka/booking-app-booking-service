@@ -33,4 +33,12 @@ public class ReservationRepository(AppDbContext context) : CrudRepository<Reserv
             .Where(p => p.GuestUsername == username && p.Active)
             .ToListAsync();
     }
+
+    public async Task<int> GetUserCancellationNumber(string username)
+    {
+        return (await _dbSet
+            .Include(p => p.Accommodation)
+            .Where(p => p.GuestUsername == username && !p.Active)
+            .ToListAsync()).Count;
+    }
 }
