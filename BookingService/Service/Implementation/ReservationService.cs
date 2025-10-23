@@ -1,4 +1,5 @@
-﻿using BookingService.Mapper;
+﻿using System.Runtime.InteropServices.JavaScript;
+using BookingService.Mapper;
 using BookingService.Model.Dto;
 using BookingService.Model.Entity;
 using BookingService.Repository.Contract;
@@ -41,5 +42,39 @@ public class ReservationService(IMapperManager mapperManager, IRepositoryManager
         };
 
         await repositoryManager.ReservationRepository.AddAsync(reservation);
+    }
+
+    public async Task<IEnumerable<ReservationDto>> GetMy(string username)
+    {
+        var reservations = await repositoryManager.ReservationRepository.GetMy(username);
+
+        List<ReservationDto> result = [];
+
+        foreach (var reservation in reservations)
+        {
+            result.Add(await mapperManager.ReservationToReservationDtoMapper.Map(reservation));
+        }
+
+        return result;
+    }
+
+    public async Task Cancel(int reservationId)
+    {
+        var reservation = await repositoryManager.ReservationRepository.GetByIdAsync(reservationId);
+
+        if (reservation is null) throw new Exception("Reservation does not exist");
+        
+        if(!reservation.Active) throw new Exception("Reservation does not exist");
+
+        var todayUtc = DateTime.Today;
+
+        if (reservation.StartDate.Date <= todayUtc) 
+        {
+            throw new Exception("Cannot cancel a reservation that has already started");
+        }
+
+        reservation.Active = false;
+
+        await repositoryManager.ReservationRepository.UpdateAsync(reservation);
     }
 }

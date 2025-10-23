@@ -27,6 +27,14 @@ RUN dotnet publish -c release --no-build -o /app
 # final stage/image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
+
+RUN apt-get update && \
+    apt-get install -y tzdata && \
+    ln -snf /usr/share/zoneinfo/Europe/Belgrade /etc/localtime && \
+    echo "Europe/Belgrade" > /etc/timezone && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+
 COPY --from=publish /app .
 
 EXPOSE 8080

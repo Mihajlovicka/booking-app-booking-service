@@ -17,6 +17,7 @@ public class ReservationToReservationDtoMapper() : BaseMapper<Reservation, Reser
             FinalPrice = source.FinalPrice,
             StartDate = source.StartDate.ToString("yyyy-MM-dd"),
             EndDate = source.EndDate.ToString("yyyy-MM-dd"),
+            AccommodationName = source.Accommodation.Name
         };
 
         return Task.FromResult(dto);
