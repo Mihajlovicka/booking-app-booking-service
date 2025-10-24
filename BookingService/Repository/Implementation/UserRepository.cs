@@ -11,4 +11,17 @@ public class UserRepository(AppDbContext context) : CrudRepository<User>(context
     {
         return await _context.Users.FirstOrDefaultAsync(x => x.Username.Equals(username));
     }
+
+    public async Task<int> DeleteByUsernameAsync(string username)
+    {
+        var users = await _dbSet
+            .Where(a => a.Username == username)
+            .ToListAsync();
+
+        if (users.Count == 0)
+            return 0;
+
+        _dbSet.RemoveRange(users);
+        return await _context.SaveChangesAsync();
+    }
 }

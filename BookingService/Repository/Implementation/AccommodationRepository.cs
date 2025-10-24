@@ -29,14 +29,15 @@ public class AccommodationRepository(AppDbContext context, IUserContext userCont
 
         var role = userContext.Role;
         var user = userContext.Name;
-        if(role == "HOST") {
+        if (role == "HOST")
+        {
             query = query.Where(a => a.Owner == user);
         }
 
 
         if (filter == null)
             return await query.ToListAsync();
-        
+
         // Filter by address
         if (!string.IsNullOrWhiteSpace(filter.Address))
         {
@@ -82,6 +83,19 @@ public class AccommodationRepository(AppDbContext context, IUserContext userCont
 
 
         return await query.ToListAsync();
+    }
+    
+    public async Task<int> DeleteByOwnerAsync(string ownerUsername)
+    {
+        var accommodations = await _dbSet
+            .Where(a => a.Owner == ownerUsername)
+            .ToListAsync();
+
+        if (accommodations.Count == 0)
+            return 0;
+
+        _dbSet.RemoveRange(accommodations);
+        return await _context.SaveChangesAsync();
     }
 
 

@@ -88,10 +88,30 @@ public class ConsumerService : BackgroundService
                             break;
                         }
                         case UserDto userDto:
-                            var user = await mapperManager.UserDtoToUserMapper.Map(userDto);
-                            await repositoryManager.UserRepository.AddAsync(user);
+                            if (topic == KafkaTopic.UserCreated.ToString())
+                            {
+                                var user = await mapperManager.UserDtoToUserMapper.Map(userDto);
+                                await repositoryManager.UserRepository.AddAsync(user);
 
-                            _logger.LogInformation($"User '{userDto.Username}' saved in BookingService.");
+                                _logger.LogInformation($"User '{userDto.Username}' saved in BookingService.");
+                                break;
+                            }
+                            if (topic == KafkaTopic.DeleteUser.ToString())
+                            {
+                                var user = await repositoryManager.UserRepository.GetByUsernameAsync(userDto.Username);
+                                if (user.Role == Role.HOST)
+                                {
+                                    await repositoryManager.AccommodationRepository.DeleteByOwnerAsync(user.Username);
+                                }
+                                else
+                                {
+                                    await repositoryManager.ReservationRepository.DeleteByGuestAsync(user.Username);
+                                    await repositoryManager.ReservationRequestRepository.DeleteByGuestAsync(user.Id);
+                                }
+                                await repositoryManager.UserRepository.DeleteByUsernameAsync(user.Username);
+                                _logger.LogInformation($"User '{userDto.Username}' delete in BookingService.");
+                                break;
+                            }
                             break;
                         default:
                             _logger.LogWarning($"Unknown message type received for topic {topic}");

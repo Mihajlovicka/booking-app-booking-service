@@ -6,12 +6,14 @@ public static class TopicTypeMap
     public static readonly Dictionary<KafkaTopic, Type> Map = new()
     {
         { KafkaTopic.AccommodationCreated, typeof(AccommodationCreatedDto) },
-        { KafkaTopic.UserCreated, typeof(UserDto)}
+        { KafkaTopic.UserCreated, typeof(UserDto)},
+        { KafkaTopic.DeleteUser, typeof(UserDto)}
     };
 }
 
 public enum KafkaTopic
 {
     AccommodationCreated,
-    UserCreated
+    UserCreated,
+    DeleteUser
 }

@@ -62,4 +62,14 @@ public class AvailabilityService(
         await repositoryManager.AvailabilityPeriodRepository.DeleteAsync(id);
     }
 
+    public async Task<UserDeleteCheckDto> UserDeleteCheckStatus()
+    {
+        int count = await repositoryManager.ReservationRepository.GetFutureReservationCountAsync();
+        var d = new UserDeleteCheckDto
+        {
+            requestDenied = count > 0
+        };
+        return d;
+    }
+
 }
