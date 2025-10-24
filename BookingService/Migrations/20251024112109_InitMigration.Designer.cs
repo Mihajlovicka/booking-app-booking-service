@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookingService.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251022231937_Init")]
-    partial class Init
+    [Migration("20251024112109_InitMigration")]
+    partial class InitMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,6 +32,9 @@ namespace BookingService.Migrations
                     b.Property<int>("AddressId")
                         .HasColumnType("int")
                         .HasColumnName("address_id");
+
+                    b.Property<bool>("AutomaticReservation")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("ExternalId")
                         .IsRequired()
@@ -164,6 +167,9 @@ namespace BookingService.Migrations
                     b.Property<int>("AccommodationId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("Active")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("date");
 
@@ -228,6 +234,31 @@ namespace BookingService.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("ReservationRequests");
+                });
+
+            modelBuilder.Entity("BookingService.Model.Entity.Review", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("EntityInfo")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Grade")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RaterUsername")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("ReviewFor")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("BookingService.Model.Entity.User", b =>

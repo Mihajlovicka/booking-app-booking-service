@@ -1,6 +1,5 @@
 ﻿using BookingService.Model.Dto;
 using BookingService.Model.Entity;
-using BookingService.Repository.Contract;
 
 namespace BookingService.Mapper.ReservationMapper;
 
@@ -17,7 +16,8 @@ public class ReservationToReservationDtoMapper() : BaseMapper<Reservation, Reser
             FinalPrice = source.FinalPrice,
             StartDate = source.StartDate.ToString("yyyy-MM-dd"),
             EndDate = source.EndDate.ToString("yyyy-MM-dd"),
-            AccommodationName = source.Accommodation.Name
+            AccommodationName = source.Accommodation.Name,
+            HostUsername = source.Accommodation.Owner
         };
 
         return Task.FromResult(dto);

@@ -7,7 +7,7 @@ using MySql.EntityFrameworkCore.Metadata;
 namespace BookingService.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class InitMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,6 +30,23 @@ namespace BookingService.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Addresses", x => x.id);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Reviews",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    Grade = table.Column<int>(type: "int", nullable: false),
+                    RaterUsername = table.Column<string>(type: "longtext", nullable: false),
+                    ReviewFor = table.Column<int>(type: "int", nullable: false),
+                    EntityInfo = table.Column<string>(type: "longtext", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Reviews", x => x.Id);
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
@@ -61,7 +78,8 @@ namespace BookingService.Migrations
                     PriceType = table.Column<int>(type: "int", nullable: false),
                     address_id = table.Column<int>(type: "int", nullable: false),
                     min_number_of_guests = table.Column<int>(type: "int", nullable: true),
-                    max_number_of_guests = table.Column<int>(type: "int", nullable: true)
+                    max_number_of_guests = table.Column<int>(type: "int", nullable: true),
+                    AutomaticReservation = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -163,7 +181,8 @@ namespace BookingService.Migrations
                     GuestNumber = table.Column<int>(type: "int", nullable: false),
                     FinalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     AccommodationId = table.Column<int>(type: "int", nullable: false),
-                    external_id = table.Column<Guid>(type: "char(36)", maxLength: 36, nullable: false)
+                    external_id = table.Column<Guid>(type: "char(36)", maxLength: 36, nullable: false),
+                    Active = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -222,6 +241,9 @@ namespace BookingService.Migrations
 
             migrationBuilder.DropTable(
                 name: "Reservations");
+
+            migrationBuilder.DropTable(
+                name: "Reviews");
 
             migrationBuilder.DropTable(
                 name: "Users");

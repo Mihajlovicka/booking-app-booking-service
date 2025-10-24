@@ -233,6 +233,31 @@ namespace BookingService.Migrations
                     b.ToTable("ReservationRequests");
                 });
 
+            modelBuilder.Entity("BookingService.Model.Entity.Review", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("EntityInfo")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Grade")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RaterUsername")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("ReviewFor")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Reviews");
+                });
+
             modelBuilder.Entity("BookingService.Model.Entity.User", b =>
                 {
                     b.Property<int>("Id")

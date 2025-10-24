@@ -17,4 +17,5 @@ public interface IMapperManager
     }
     IBaseMapper<ReservationRequest, ReservationRequestDto> ReservationRequestToReservationRequestDtoMapper { get; }
     IBaseMapper<Reservation, ReservationDto> ReservationToReservationDtoMapper { get; }
+    IBaseMapper<Review, ReviewDto> ReviewToReviewDtoMapper { get; }
 }

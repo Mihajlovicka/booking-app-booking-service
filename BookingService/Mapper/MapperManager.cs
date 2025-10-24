@@ -12,7 +12,8 @@ public class MapperManager(
     IBaseMapper<UserDto, User> UserDtoToUserMapper,
     IBaseMapper<CreateReservationRequestDto, ReservationRequest> CreateReservationRequestDtoToReservationRequestMapper,
     IBaseMapper<ReservationRequest, ReservationRequestDto> ReservationRequestToReservationRequestDtoMapper,
-    IBaseMapper<Reservation, ReservationDto> ReservationToReservationDtoMapper) : IMapperManager
+    IBaseMapper<Reservation, ReservationDto> ReservationToReservationDtoMapper,
+    IBaseMapper<Review, ReviewDto> ReviewToReviewDtoMapper) : IMapperManager
 {
     public IBaseMapper<AvailabilityPeriod, AvailabilityPeriodDto> AvailabilityPeriodToAvailabilityPeriodDtoMapper { get; } =
         AvailabilityPeriodToAvailabilityPeriodDtoMapper;
@@ -39,4 +40,6 @@ public class MapperManager(
 
     public IBaseMapper<Reservation, ReservationDto> ReservationToReservationDtoMapper { get; } =
         ReservationToReservationDtoMapper;
+
+    public IBaseMapper<Review, ReviewDto> ReviewToReviewDtoMapper { get; } = ReviewToReviewDtoMapper;
 }
