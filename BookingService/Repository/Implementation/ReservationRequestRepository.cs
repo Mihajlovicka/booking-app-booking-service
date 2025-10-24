@@ -41,5 +41,19 @@ public class ReservationRequestRepository(AppDbContext context)
             .Include(r => r.Guest)
             .Include(r => r.Accommodation)
             .Where(r => r.Guest.Username == username).ToListAsync();
+
+    }
+    public async Task<int> DeleteByGuestAsync(int UserId)
+    {
+        var users = await _dbSet
+            .Where(a => a.UserId == UserId)
+            .ToListAsync();
+
+        if (users.Count == 0)
+            return 0;
+
+        _dbSet.RemoveRange(users);
+        return await _context.SaveChangesAsync();
+
     }
 }

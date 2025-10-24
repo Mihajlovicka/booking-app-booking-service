@@ -141,8 +141,7 @@ namespace BookingService.Migrations
                         .HasColumnName("id");
 
                     b.Property<int>("AccommodationId")
-                        .HasColumnType("int")
-                        .HasColumnName("accommodation_id");
+                        .HasColumnType("int");
 
                     b.Property<string>("Url")
                         .IsRequired()

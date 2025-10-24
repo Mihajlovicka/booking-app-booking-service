@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookingService.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251021214102_AppModelInit")]
-    partial class AppModelInit
+    [Migration("20251022231937_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -141,8 +141,7 @@ namespace BookingService.Migrations
                         .HasColumnName("id");
 
                     b.Property<int>("AccommodationId")
-                        .HasColumnType("int")
-                        .HasColumnName("accommodation_id");
+                        .HasColumnType("int");
 
                     b.Property<string>("Url")
                         .IsRequired()
