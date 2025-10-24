@@ -18,6 +18,8 @@ var serviceName = Environment.GetEnvironmentVariable("SERVICE_NAME") ?? "unknown
 
 if (environment == "Docker" || environment == "Testing")
 {
+    Console.WriteLine($"Environment: '{environment}'");
+
     builder.Configuration.AddJsonFile(
         "appsettings.Docker.json",
         optional: true,
