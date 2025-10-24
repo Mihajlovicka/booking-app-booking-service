@@ -13,4 +13,5 @@ public class AccommodationDto
     public AddressDto Address { get; set; }
     public List<string> Pictures { get; set; }
     public string? PriceType { get; set; }
+    public double AverageGrade { get; set; }
 }

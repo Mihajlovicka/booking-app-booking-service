@@ -65,4 +65,80 @@ public class ReviewService(IRepositoryManager repositoryManager) : IReviewServic
         }
     }
 
+    public async Task<double> GetAverageGradeForAccommodation(string externalId)
+    {
+        var grades = (await repositoryManager.ReviewRepository
+                .GetByEntityInfo(externalId))
+            .Select(x => x.Grade);
+
+        var enumerable = grades as int[] ?? grades.ToArray();
+        var averageGrade = enumerable.Length == 0 ? 0 : enumerable.Average();
+
+        return averageGrade;
+    }
+
+    public async Task<IEnumerable<ViewHostAccommodationReviewDto>> GetAccommodationViewGrades(string externalId)
+    {
+        var accommodation = await repositoryManager.AccommodationRepository.GetByExternalIdAsync(externalId);
+
+        var ownerUsername = accommodation.Owner;
+
+        List<ViewHostAccommodationReviewDto> result = [];
+        var accommodationReviews = await repositoryManager.ReviewRepository.GetByEntityInfo(externalId);
+        
+        foreach (var rate in accommodationReviews)
+        {
+            var hostinfo = await GetHostReviewInfoRaterAndHost(rate.RaterUsername, ownerUsername);
+            result.Add(new ViewHostAccommodationReviewDto()
+            {
+                RaterUserName = rate.RaterUsername,
+                AccommodationGrade = rate.Grade,
+                AccommodationName = accommodation.Name,
+                AccommodationExternalId = externalId,
+                HostUsername = hostinfo?.EntityInfo ?? "",
+                HostGrade = hostinfo?.Grade ?? 0
+            });
+        }
+
+        return result;
+    }
+    
+    public async Task<ViewHostAccommodationReviewDto> GetAccommodationViewGradesForRater(string externalId, string raterUsername)
+    {
+        var accommodation = await repositoryManager.AccommodationRepository.GetByExternalIdAsync(externalId);
+
+        var ownerUsername = accommodation.Owner;
+
+        var hostReview = await GetHostReviewInfoRaterAndHost(raterUsername, ownerUsername);
+        
+        var accReview =  await repositoryManager.ReviewRepository.GetByEntityInfoRaterUsername(externalId, raterUsername);
+
+        return new ViewHostAccommodationReviewDto()
+        {
+            RaterUserName = raterUsername,
+            AccommodationGrade = accReview?.Grade ?? 0,
+            AccommodationName = accommodation.Name,
+            AccommodationExternalId = externalId,
+            HostUsername = ownerUsername,
+            HostGrade = hostReview?.Grade ?? 0
+        };
+    }
+
+    public async Task DeleteReviewsForAccommodation(string externalId, string raterUsername)
+    {
+        var accommodation = await repositoryManager.AccommodationRepository.GetByExternalIdAsync(externalId);
+
+        var ownerUsername = accommodation.Owner;
+
+        var hostReview = await GetHostReviewInfoRaterAndHost(raterUsername, ownerUsername);
+        
+        var accReview =  await repositoryManager.ReviewRepository.GetByEntityInfoRaterUsername(externalId, raterUsername);
+
+        await repositoryManager.ReviewRepository.DeleteTwoReviewsAsync(hostReview.Id, accReview.Id);
+    }
+
+    private async Task<Review?> GetHostReviewInfoRaterAndHost(string rater, string host)
+    {
+        return await repositoryManager.ReviewRepository.GetByEntityInfoRaterUsername(host, rater);
+    }
 }
