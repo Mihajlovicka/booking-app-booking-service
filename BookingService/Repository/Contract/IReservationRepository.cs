@@ -10,4 +10,5 @@ public interface IReservationRepository : ICrudRepository<Reservation>
     Task<int> GetUserCancellationNumber(string username);
     Task<int> GetFutureReservationCountAsync();
     Task<int> DeleteByGuestAsync(string username);
+    Task<Reservation> GetByIdAsyncWithAccomodation(int reservationId);
 }

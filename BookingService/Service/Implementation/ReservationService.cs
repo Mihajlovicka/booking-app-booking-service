@@ -2,12 +2,18 @@
 using BookingService.Mapper;
 using BookingService.Model.Dto;
 using BookingService.Model.Entity;
+using BookingService.Model.Messages;
 using BookingService.Repository.Contract;
 using BookingService.Service.Contract;
+using BookingService.Service.MessagingService;
 
 namespace BookingService.Service.Implementation;
 
-public class ReservationService(IMapperManager mapperManager, IRepositoryManager repositoryManager)
+public class ReservationService(
+    IMapperManager mapperManager,
+    IRepositoryManager repositoryManager,
+    ProducerService producerService,
+    IUserContext userContext)
     : IReservationService
 {
     public async Task<IEnumerable<ReservationDto>> GetByAccommodation(string accommodationId)
@@ -60,7 +66,7 @@ public class ReservationService(IMapperManager mapperManager, IRepositoryManager
 
     public async Task Cancel(int reservationId)
     {
-        var reservation = await repositoryManager.ReservationRepository.GetByIdAsync(reservationId);
+        var reservation = await repositoryManager.ReservationRepository.GetByIdAsyncWithAccomodation(reservationId);
 
         if (reservation is null) throw new Exception("Reservation does not exist");
         
@@ -76,5 +82,20 @@ public class ReservationService(IMapperManager mapperManager, IRepositoryManager
         reservation.Active = false;
 
         await repositoryManager.ReservationRepository.UpdateAsync(reservation);
+
+        var role = userContext.Role;
+        if(role == Role.GUEST.ToString())
+        {
+            var user = await repositoryManager.UserRepository.GetByUsernameAsync(reservation.Accommodation.Owner);
+            var notificationDto = new NotificationDto
+            {
+                NotificationTypeId = (int)NotificationType.CancelReservation,
+                NotificationUserExternalId = user.ExternalId,
+                Message = "Reservation " + reservation.Accommodation.Name +" canceled"
+            };
+
+            await producerService.ProduceAsync<NotificationDto>(KafkaTopic.NotificationCreated.ToString(), notificationDto);
+        }
+
     }
 }

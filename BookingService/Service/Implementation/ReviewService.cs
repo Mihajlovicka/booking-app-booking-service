@@ -1,12 +1,15 @@
 using BookingService.Mapper;
 using BookingService.Model.Dto;
 using BookingService.Model.Entity;
+using BookingService.Model.Messages;
 using BookingService.Repository.Contract;
 using BookingService.Service.Contract;
+using BookingService.Service.MessagingService;
 
 namespace BookingService.Service.Implementation;
 
-public class ReviewService(IRepositoryManager repositoryManager) : IReviewService
+public class ReviewService(IRepositoryManager repositoryManager,
+    ProducerService producerService) : IReviewService
 {
     public async Task Add(IEnumerable<ReviewDto> reviewDtos)
     {
@@ -28,6 +31,8 @@ public class ReviewService(IRepositoryManager repositoryManager) : IReviewServic
                     Grade = reviewDto.Grade,
                     ReviewFor = Enum.Parse<ReviewFor>(reviewDto.ReviewFor, true)
                 };
+
+                NotificationDto notificationDto;
                 
                 switch (reviewDto.ReviewFor.ToUpperInvariant())
                 {
@@ -36,7 +41,18 @@ public class ReviewService(IRepositoryManager repositoryManager) : IReviewServic
                         var host = await repositoryManager.UserRepository.GetByUsernameAsync(reviewDto.EntityInfo);
                         if (host is null)
                             throw new Exception($"Host '{reviewDto.EntityInfo}' does not exist");
-                        review.EntityInfo = host.Username;
+                            review.EntityInfo = host.Username;
+                        
+
+                            user = await repositoryManager.UserRepository.GetByUsernameAsync(host.Username);
+
+                            notificationDto = new NotificationDto
+                            {
+                                NotificationTypeId = (int)NotificationType.NewRateOnHost,
+                                NotificationUserExternalId = user.ExternalId,
+                                Message = "New rating on you"
+                            };
+                            await producerService.ProduceAsync<NotificationDto>(KafkaTopic.NotificationCreated.ToString(), notificationDto);
                         break;
                     }
                     case "ACCOMMODATION":
@@ -48,7 +64,18 @@ public class ReviewService(IRepositoryManager repositoryManager) : IReviewServic
                             await repositoryManager.AccommodationRepository.GetByExternalIdAsync(reviewDto.EntityInfo);
                         if (accommodation is null)
                             throw new Exception($"Accommodation '{reviewDto.EntityInfo}' does not exist");
-                        review.EntityInfo = accommodation.ExternalId;
+                            review.EntityInfo = accommodation.ExternalId;
+                        
+
+                        user = await repositoryManager.UserRepository.GetByUsernameAsync(accommodation.Owner);
+
+                            notificationDto = new NotificationDto
+                            {
+                                NotificationTypeId = (int)NotificationType.NewRateOnAccommodation,
+                                NotificationUserExternalId = user.ExternalId,
+                                Message = "New rating on accomodation " + accommodation.Name
+                            };
+                            await producerService.ProduceAsync<NotificationDto>(KafkaTopic.NotificationCreated.ToString(), notificationDto);
                         break;
                     }
                     default:

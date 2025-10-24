@@ -25,6 +25,7 @@ public class AccommodationRepository(AppDbContext context, IUserContext userCont
             .Include(a => a.Address)
             .Include(a => a.Pictures)
             .Include(a => a.AvailabilityPeriods)
+            .Include(a => a.Reservations)
             .AsQueryable();
 
         var role = userContext.Role;
@@ -55,11 +56,16 @@ public class AccommodationRepository(AppDbContext context, IUserContext userCont
                 (!a.MaxNumberOfGuests.HasValue || a.MaxNumberOfGuests >= filter.NumberOfGuests));
         }
 
+        DateTime? start = null;
+        DateTime? end = null;
+
+
         // Filter by start date if provided
         if (!string.IsNullOrWhiteSpace(filter.StartDate))
         {
-            if (DateTime.TryParse(filter.StartDate, out DateTime start))
+            if (DateTime.TryParse(filter.StartDate, out DateTime parsedStart))
             {
+                start = parsedStart;
                 query = query.Where(a => a.AvailabilityPeriods.Any(p => p.StartDate <= start && p.EndDate >= start));
             }
             else
@@ -71,8 +77,9 @@ public class AccommodationRepository(AppDbContext context, IUserContext userCont
         // Filter by end date if provided
         if (!string.IsNullOrWhiteSpace(filter.EndDate))
         {
-            if (DateTime.TryParse(filter.EndDate, out DateTime end))
+            if (DateTime.TryParse(filter.EndDate, out DateTime parsedEnd))
             {
+                end = parsedEnd;
                 query = query.Where(a => a.AvailabilityPeriods.Any(p => p.StartDate <= end && p.EndDate >= end));
             }
             else
@@ -81,6 +88,14 @@ public class AccommodationRepository(AppDbContext context, IUserContext userCont
             }
         }
 
+
+        if (start.HasValue && end.HasValue)
+            {
+                query = query.Where(a =>
+                    !a.Reservations.Any(r =>
+                        (r.StartDate <= end.Value && r.EndDate >= start.Value) && r.Active
+                    ));
+            }
 
         return await query.ToListAsync();
     }

@@ -1,12 +1,18 @@
 ﻿using BookingService.Mapper;
 using BookingService.Model.Dto;
 using BookingService.Model.Entity;
+using BookingService.Model.Messages;
 using BookingService.Repository.Contract;
 using BookingService.Service.Contract;
+using BookingService.Service.MessagingService;
 
 namespace BookingService.Service.Implementation;
 
-public class ReservationRequestService(IMapperManager mapperManager, IRepositoryManager repositoryManager, IReservationService reservationService) : IReservationRequestService
+public class ReservationRequestService(
+    IMapperManager mapperManager,
+    IRepositoryManager repositoryManager,
+    IReservationService reservationService,
+    ProducerService producerService) : IReservationRequestService
 {
     public async Task<ReservationRequestDto> Add(string guestUsername, CreateReservationRequestDto dto)
     {
@@ -48,7 +54,30 @@ public class ReservationRequestService(IMapperManager mapperManager, IRepository
         if (reservationRequest.Accommodation.AutomaticReservation)
         {
             await AcceptRequest(reservationRequest.ExternalId.ToString());
+            var user = await repositoryManager.UserRepository.GetByUsernameAsync(reservationRequest.Guest.Username);
+
+            var notificationDto = new NotificationDto
+            {
+                NotificationTypeId = (int)NotificationType.ReservationProcessed,
+                NotificationUserExternalId = user.ExternalId,
+                Message = "Reservation created for " + reservationRequest.Accommodation.Name
+            };
+            await producerService.ProduceAsync<NotificationDto>(KafkaTopic.NotificationCreated.ToString(), notificationDto);
         }
+        else
+        {
+            var user = await repositoryManager.UserRepository.GetByUsernameAsync(accommodation.Owner);
+
+            var notificationDto = new NotificationDto
+            {
+                NotificationTypeId = (int)NotificationType.CreateReservation,
+                NotificationUserExternalId = user.ExternalId,
+                Message = "New reservation request is created for " + accommodation.Name
+            };
+            await producerService.ProduceAsync<NotificationDto>(KafkaTopic.NotificationCreated.ToString(), notificationDto);
+            
+        }
+
 
         return await mapperManager.ReservationRequestToReservationRequestDtoMapper.Map(reservationRequest);
     }
@@ -81,7 +110,17 @@ public class ReservationRequestService(IMapperManager mapperManager, IRepository
         if (reservationRequest == null) 
             throw new Exception("Request not found");
 
+        var user = await repositoryManager.UserRepository.GetByUsernameAsync(reservationRequest.Guest.Username);
+
+        var notificationDto = new NotificationDto
+        {
+            NotificationTypeId = (int)NotificationType.ReservationProcessed,
+            NotificationUserExternalId = user.ExternalId,
+            Message = "Reservation request for " + reservationRequest.Accommodation.Name + " rejected"
+        };
+        await producerService.ProduceAsync<NotificationDto>(KafkaTopic.NotificationCreated.ToString(), notificationDto);
         await repositoryManager.ReservationRequestRepository.DeleteAsync(reservationRequest.Id);
+
     }
 
     public async Task AcceptRequest(string requestExternalId)
@@ -97,12 +136,32 @@ public class ReservationRequestService(IMapperManager mapperManager, IRepository
         var requestsForDeletion = await repositoryManager.ReservationRequestRepository.Overlaps(
             reservationRequest.Accommodation.ExternalId, reservationRequest.StartDate, reservationRequest.EndDate);
 
+        User user;
+        NotificationDto notificationDto;
         foreach (var request in requestsForDeletion)
         {
+            user = await repositoryManager.UserRepository.GetByUsernameAsync(request.Guest.Username);
+
+            notificationDto = new NotificationDto
+            {
+                NotificationTypeId = (int)NotificationType.ReservationProcessed,
+                NotificationUserExternalId = user.ExternalId,
+                Message = "Reservation request for " + reservationRequest.Accommodation.Name + " rejected"
+            };
+            await producerService.ProduceAsync<NotificationDto>(KafkaTopic.NotificationCreated.ToString(), notificationDto);
             await repositoryManager.ReservationRequestRepository.DeleteAsync(request.Id);
         }
-        
+
         await reservationService.CreateReservation(reservationRequest);
+        user = await repositoryManager.UserRepository.GetByUsernameAsync(reservationRequest.Guest.Username);
+
+        notificationDto = new NotificationDto
+        {
+            NotificationTypeId = (int)NotificationType.ReservationProcessed,
+            NotificationUserExternalId = user.ExternalId,
+            Message = "Reservation request for " + reservationRequest.Accommodation.Name + " accepted"
+        };
+        await producerService.ProduceAsync<NotificationDto>(KafkaTopic.NotificationCreated.ToString(), notificationDto);
 
         await repositoryManager.ReservationRequestRepository.DeleteAsync(reservationRequest.Id);
     }

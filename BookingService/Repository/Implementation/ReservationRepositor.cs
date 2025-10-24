@@ -42,6 +42,14 @@ public class ReservationRepository(AppDbContext context, IUserContext userContex
             .ToListAsync()).Count;
     }
 
+    public async Task<Reservation> GetByIdAsyncWithAccomodation(int reservationId)
+    {
+        return await _dbSet
+            .Include(p => p.Accommodation)
+            .Where(p => p.Id == reservationId)
+            .FirstOrDefaultAsync();
+    }
+
     public async Task<int> GetFutureReservationCountAsync()
     {
         var today = DateTime.Now.Date;

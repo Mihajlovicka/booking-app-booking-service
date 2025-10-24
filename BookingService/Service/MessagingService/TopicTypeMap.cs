@@ -7,7 +7,8 @@ public static class TopicTypeMap
     {
         { KafkaTopic.AccommodationCreated, typeof(AccommodationCreatedDto) },
         { KafkaTopic.UserCreated, typeof(UserDto)},
-        { KafkaTopic.DeleteUser, typeof(UserDto)}
+        { KafkaTopic.DeleteUser, typeof(UserDto)},
+        { KafkaTopic.NotificationCreated, typeof(NotificationDto) }
     };
 }
 
@@ -15,5 +16,6 @@ public enum KafkaTopic
 {
     AccommodationCreated,
     UserCreated,
-    DeleteUser
+    DeleteUser,
+    NotificationCreated
 }

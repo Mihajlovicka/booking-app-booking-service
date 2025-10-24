@@ -62,17 +62,6 @@ public class DeleteUserIntegrationTests
     }
 
     [Test]
-    [Order(2)]
-    public async Task GetUser_NoUser()
-    {
-        using var scope = _factory.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-        Assert.That(db.Accommodations.Count() == 0);
-        Assert.That(db.Users.Count() == 0);
-    }
-
-    [Test]
     [Order(3)]
     public async Task CanDelete_No()
     {

@@ -27,7 +27,8 @@ public class ReservationRequestRepository(AppDbContext context)
     
     public async Task<IEnumerable<ReservationRequest>> Overlaps(string accommodationId, DateTime start, DateTime end)
     {
-        return await  _dbSet
+        return await _dbSet
+            .Include(p=> p.Guest)
             .Include(p => p.Accommodation)
             .Where(p => 
                 p.Accommodation.ExternalId == accommodationId &&
