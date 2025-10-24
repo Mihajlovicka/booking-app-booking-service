@@ -10,4 +10,5 @@ public interface IRepositoryManager
    IReservationRepository ReservationRepository { get; }
    IReservationRequestRepository ReservationRequestRepository { get; }
    IUserRepository UserRepository { get; }
+   IReviewRepository ReviewRepository { get; }
 }

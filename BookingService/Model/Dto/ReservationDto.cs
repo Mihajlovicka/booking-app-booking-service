@@ -10,4 +10,5 @@ public class ReservationDto
     public int GuestNumber { get; set; }
     public decimal FinalPrice { get; set; }
     public string? AccommodationName { get; set; }
+    public string HostUsername { get; set; }
 }

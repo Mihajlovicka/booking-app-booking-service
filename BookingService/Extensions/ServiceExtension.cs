@@ -3,6 +3,7 @@ using BookingService.Mapper;
 using BookingService.Mapper.AccommodationMapper;
 using BookingService.Mapper.AvailabilityMapper;
 using BookingService.Mapper.ReservationMapper;
+using BookingService.Mapper.ReviewMapper;
 using BookingService.Mapper.UserMapper;
 using BookingService.Model.Dto;
 using BookingService.Model.Entity;
@@ -26,6 +27,7 @@ public static class ServiceExtensions
         services.AddScoped<IAvailabilityService, AvailabilityService>();
         services.AddScoped<IReservationRequestService, ReservationRequestService>();
         services.AddScoped<IReservationService, ReservationService>();
+        services.AddScoped<IReviewService, ReviewService>();
 
         // Mapper-related scoped services
         services.AddScoped<IMapperManager, MapperManager>();
@@ -37,6 +39,7 @@ public static class ServiceExtensions
         services.AddScoped<IBaseMapper<CreateReservationRequestDto, ReservationRequest>, CreateReservationRequestDtoToReservationRequestMapper>();
         services.AddScoped<IBaseMapper<ReservationRequest, ReservationRequestDto>, ReservationRequestToReservationRequestDtoMapper>();
         services.AddScoped<IBaseMapper<Reservation, ReservationDto>, ReservationToReservationDtoMapper>();
+        services.AddScoped<IBaseMapper<Review, ReviewDto>, ReviewToReviewDtoMapper>();
 
         // Repository-related scoped services
         services.AddScoped<IRepositoryManager, RepositoryManager>();
@@ -46,6 +49,7 @@ public static class ServiceExtensions
         services.AddScoped<IReservationRepository, ReservationRepository>();
         services.AddScoped<IReservationRequestRepository, ReservationRequestRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IReviewRepository, ReviewRepository>();
 
         return services;
     }
