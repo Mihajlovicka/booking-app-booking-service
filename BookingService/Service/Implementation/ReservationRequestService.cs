@@ -63,6 +63,8 @@ public class ReservationRequestService(IMapperManager mapperManager, IRepository
         foreach (var request in reservationRequests)
         {
             var mapped = await mapperManager.ReservationRequestToReservationRequestDtoMapper.Map(request);
+            mapped.UserCancellationNumber =
+                await repositoryManager.ReservationRepository.GetUserCancellationNumber(request.Guest.Username);
             mappedRequests.Add(mapped);
         }
 
