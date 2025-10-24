@@ -20,7 +20,8 @@ public class AvailabilityControllerIntegrationTests
 {
     private HttpClient _client;
     private CustomWebApplicationFactory _factory;
-    private string KafkaBroker = "localhost:29092";
+    private string KafkaBroker = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Docker" 
+                || Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Testing" ? "kafka:9092":"localhost:29092";
     private Guid accommodationId;
 
     [OneTimeSetUp]
