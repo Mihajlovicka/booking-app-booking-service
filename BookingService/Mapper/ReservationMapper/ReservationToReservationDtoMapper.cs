@@ -1,12 +1,23 @@
 ﻿using BookingService.Model.Dto;
 using BookingService.Model.Entity;
+using BookingService.Repository.Contract;
 
 namespace BookingService.Mapper.ReservationMapper;
 
-public class ReservationToReservationDtoMapper() : BaseMapper<Reservation, ReservationDto>
+public class ReservationToReservationDtoMapper(IRepositoryManager repositoryManager) : BaseMapper<Reservation, ReservationDto>
 {
-    public override Task<ReservationDto> Map(Reservation source)
+    public override async Task<ReservationDto> Map(Reservation source)
     {
+        var grades = (await repositoryManager.ReviewRepository
+                .GetByEntityInfo(source.Accommodation.ExternalId.ToString()))
+            .Select(x => x.Grade);
+        
+        
+
+        var enumerable = grades as int[] ?? grades.ToArray();
+        var hasReview = enumerable.Length != 0;
+        var averageGrade = enumerable.Length == 0 ? 0 : enumerable.Average();
+        
         var dto = new ReservationDto
         {
             Id = source.Id,
@@ -17,9 +28,11 @@ public class ReservationToReservationDtoMapper() : BaseMapper<Reservation, Reser
             StartDate = source.StartDate.ToString("yyyy-MM-dd"),
             EndDate = source.EndDate.ToString("yyyy-MM-dd"),
             AccommodationName = source.Accommodation.Name,
-            HostUsername = source.Accommodation.Owner
+            HostUsername = source.Accommodation.Owner,
+            AverageGrade = averageGrade,
+            HasReview = hasReview
         };
 
-        return Task.FromResult(dto);
+        return dto;
     }
 }
