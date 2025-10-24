@@ -15,8 +15,7 @@ public class Picture
     public string Url { get; set; }
 
     [Required]
-    [ForeignKey("AccommodationId")]
-    [Column("accommodation_id")]
+    [ForeignKey(nameof(Accommodation))]
     public int AccommodationId { get; set; }
 
     public Accommodation Accommodation { get; set; }

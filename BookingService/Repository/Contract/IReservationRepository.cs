@@ -8,4 +8,6 @@ public interface IReservationRepository : ICrudRepository<Reservation>
     bool Overlaps(string accommodationId, DateTime start, DateTime end);
     Task<List<Reservation>> GetMy(string username);
     Task<int> GetUserCancellationNumber(string username);
+    Task<int> GetFutureReservationCountAsync();
+    Task<int> DeleteByGuestAsync(string username);
 }

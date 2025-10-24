@@ -24,7 +24,8 @@ public static class KafkaExtensions
             var topics = new[]
             {
                 KafkaTopic.AccommodationCreated,
-                KafkaTopic.UserCreated
+                KafkaTopic.UserCreated,
+                KafkaTopic.DeleteUser
             };
 
             return new ConsumerService(logger, consumerConfig, topics, scopeFactory);

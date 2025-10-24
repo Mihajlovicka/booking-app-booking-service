@@ -8,4 +8,5 @@ public interface IAccommodationRepository : ICrudRepository<Accommodation>
 {
     Task<Accommodation?> GetByExternalIdAsync(string externalId);
     Task<IEnumerable<Accommodation>> Search(AvailabilityFilterDto availabilityFilterDto);
+    Task<int> DeleteByOwnerAsync(string ownerUsername);
 }

@@ -7,7 +7,7 @@ using MySql.EntityFrameworkCore.Metadata;
 namespace BookingService.Migrations
 {
     /// <inheritdoc />
-    public partial class AppModelInit : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -105,14 +105,14 @@ namespace BookingService.Migrations
                     id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     url = table.Column<string>(type: "longtext", nullable: false),
-                    accommodation_id = table.Column<int>(type: "int", nullable: false)
+                    AccommodationId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Picture", x => x.id);
                     table.ForeignKey(
-                        name: "FK_Picture_Accommodations_accommodation_id",
-                        column: x => x.accommodation_id,
+                        name: "FK_Picture_Accommodations_AccommodationId",
+                        column: x => x.AccommodationId,
                         principalTable: "Accommodations",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -188,9 +188,9 @@ namespace BookingService.Migrations
                 column: "AccommodationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Picture_accommodation_id",
+                name: "IX_Picture_AccommodationId",
                 table: "Picture",
-                column: "accommodation_id");
+                column: "AccommodationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ReservationRequests_AccommodationId",
