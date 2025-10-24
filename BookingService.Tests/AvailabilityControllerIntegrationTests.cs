@@ -31,8 +31,8 @@ public class AvailabilityControllerIntegrationTests
         _client = _factory.CreateClient();
         await SetupDbData();
 
-        var config = _factory.Services.GetRequiredService<IConfiguration>();
-        KafkaBroker = config.GetValue<string>("KafkaConfig:Producer:BootstrapServers");
+        // var config = _factory.Services.GetRequiredService<IConfiguration>();
+        // KafkaBroker = config.GetValue<string>("KafkaConfig:Producer:BootstrapServers");
     
 
     }
